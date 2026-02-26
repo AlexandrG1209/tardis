@@ -1,0 +1,7 @@
+pandas
+sns
+plt
+textwrap
+sklearn
+numpy
+joblib
