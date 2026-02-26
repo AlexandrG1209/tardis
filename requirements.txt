@@ -5,3 +5,4 @@ textwrap
 sklearn
 numpy
 joblib
+pylab
