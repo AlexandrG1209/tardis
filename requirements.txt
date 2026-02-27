@@ -1,8 +1,8 @@
-pandas
-sns
-plt
-textwrap
-sklearn
-numpy
-joblib
-pylab
+#pandas
+#sns
+#plt
+#textwrap
+#sklearn
+#numpy
+#joblib
+#pylab
