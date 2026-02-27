@@ -27,8 +27,40 @@ model_columns = model_data["columns"]
 #TITLE
 
 st.title("Train Delay Prediction")
+delay_col = "Retard moyen de tous les trains à l'arrivée"
 
-# DATA OVERVIEW
+# BUILD ROUTE TABLE
+
+route_delay = (
+    df.groupby(["Gare de départ", "Gare d'arrivée"])[delay_col]
+    .mean()
+    .reset_index()
+)
+
+route_delay["Route"] = (
+    route_delay["Gare de départ"] + " → " + route_delay["Gare d'arrivée"]
+)
+
+# ROUTE SELECTION
+
+selected_route = st.selectbox(
+    "Select Route",
+    sorted(route_delay["Route"])
+)
+
+selected_row = route_delay[
+    route_delay["Route"] == selected_route
+]
+
+avg_delay = selected_row[delay_col].values[0]
+
+#DISPLAY RESULT
+
+st.metric(
+    "Average Delay (minutes)",
+    round(avg_delay, 2)
+)
+#DATA OVERVIEW
 
 st.header("Cleaned Dataset Overview")
 
@@ -46,42 +78,42 @@ col3.metric(
 
 # DELAY DISTRIBUTION
 
-st.subheader("Delay Distribution")
+st.header("Data Visualizations")
 
-fig1, ax1 = plt.subplots()
-sns.histplot(
-    df["Retard moyen de tous les trains à l'arrivée"],
-    bins=30,
-    kde=True,
-    ax=ax1
-)
-ax1.set_xlabel("Delay (minutes)")
-st.pyplot(fig1)
+col1, col2 = st.columns(2)
 
-# AVERAGE DELAY BY MONTH
-
-if "month" in df.columns:
-    st.subheader("Average Delay by Month")
-
-    month_delay = (
-        df.groupby("month")[
-            "Retard moyen de tous les trains à l'arrivée"
-        ]
-        .mean()
-        .reset_index()
+# ---------------------------
+# Delay Distribution
+# ---------------------------
+with col1:
+    fig1, ax1 = plt.subplots(figsize=(5, 3))
+    ax1.hist(
+        df["Retard moyen de tous les trains à l'arrivée"],
+        bins=30
     )
+    ax1.set_title("Delay Distribution", fontsize=10)
+    ax1.set_xlabel("Delay (min)", fontsize=8)
+    ax1.set_ylabel("Count", fontsize=8)
+    ax1.tick_params(axis='both', labelsize=8)
+    st.pyplot(fig1)
 
-    fig2, ax2 = plt.subplots()
-    sns.barplot(
-        data=month_delay,
-        x="month",
-        y="Retard moyen de tous les trains à l'arrivée",
-        ax=ax2
-    )
+# Average Delay by Month
+with col2:
+    if "month" in df.columns:
+        month_delay = (
+            df.groupby("month")[
+                "Retard moyen de tous les trains à l'arrivée"
+            ]
+            .mean()
+        )
 
-    ax2.set_ylabel("Average Delay (minutes)")
-    st.pyplot(fig2)
-
+        fig2, ax2 = plt.subplots(figsize=(5, 3))
+        ax2.plot(month_delay.index, month_delay.values)
+        ax2.set_title("Avg Delay by Month", fontsize=10)
+        ax2.set_xlabel("Month", fontsize=8)
+        ax2.set_ylabel("Avg Delay", fontsize=8)
+        ax2.tick_params(axis='both', labelsize=8)
+        st.pyplot(fig2)
 # UNIQUE STATIONS
 
 unique_departures = sorted(
