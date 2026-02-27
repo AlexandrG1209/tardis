@@ -82,38 +82,56 @@ st.header("Data Visualizations")
 
 col1, col2 = st.columns(2)
 
-# ---------------------------
 # Delay Distribution
-# ---------------------------
+
 with col1:
-    fig1, ax1 = plt.subplots(figsize=(5, 3))
-    ax1.hist(
+    fig1, ax1 = plt.subplots(figsize=(8, 4))
+
+    sns.histplot(
         df["Retard moyen de tous les trains à l'arrivée"],
-        bins=30
+        bins=200,
+        kde=True,
+        ax=ax1
     )
-    ax1.set_title("Delay Distribution", fontsize=10)
-    ax1.set_xlabel("Delay (min)", fontsize=8)
-    ax1.set_ylabel("Count", fontsize=8)
-    ax1.tick_params(axis='both', labelsize=8)
+
+    ax1.set_title("Delay analysis")
+    ax1.set_xlabel("Delay")
+    ax1.set_ylabel("Frequency")
+
+    ax1.set_xlim(-5, 100)
+    ax1.set_xticks(range(-5, 101, 5))
+
     st.pyplot(fig1)
 
 # Average Delay by Month
-with col2:
-    if "month" in df.columns:
-        month_delay = (
-            df.groupby("month")[
-                "Retard moyen de tous les trains à l'arrivée"
-            ]
-            .mean()
-        )
 
-        fig2, ax2 = plt.subplots(figsize=(5, 3))
-        ax2.plot(month_delay.index, month_delay.values)
-        ax2.set_title("Avg Delay by Month", fontsize=10)
-        ax2.set_xlabel("Month", fontsize=8)
-        ax2.set_ylabel("Avg Delay", fontsize=8)
-        ax2.tick_params(axis='both', labelsize=8)
-        st.pyplot(fig2)
+with col2:
+    # Ensure month exists
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    df["month"] = df["Date"].dt.month
+
+    pivot_m = df.pivot_table(
+        values="Retard moyen de tous les trains à l'arrivée",
+        index="month",
+        aggfunc="mean"
+    )
+
+    fig2, ax2 = plt.subplots(figsize=(6, 3))
+
+    sns.heatmap(
+        pivot_m,
+        annot=True,
+        cmap="coolwarm",
+        fmt=".2f",
+        ax=ax2
+    )
+    ax2.set_yticklabels(ax2.get_yticklabels(), rotation=0)
+
+    ax2.set_title("Average Delay by Month", fontsize=10)
+    ax2.set_ylabel("Month")
+
+    st.pyplot(fig2)
+
 # UNIQUE STATIONS
 
 unique_departures = sorted(
