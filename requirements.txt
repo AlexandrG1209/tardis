@@ -1,6 +1,6 @@
 #pandas
-#sns
-#plt
+#seaborn
+#matplotlib
 #textwrap
 #sklearn
 #numpy
