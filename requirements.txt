@@ -1,9 +1,8 @@
-#pandas
-#seaborn
-#matplotlib
-#textwrap
-#sklearn
-#numpy
-#joblib
-#pylab
-#streamlit
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+joblib
+streamlit
+jupyter
